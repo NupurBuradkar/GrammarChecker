@@ -35,26 +35,36 @@ def find_available_port(start_port: int = 8000) -> int:
     return start_port
 
 if __name__ == "__main__":
-    # Use port 8080 by default to bypass any stale process stuck on 8000
-    target_port = 8080
+    port_env = os.environ.get("PORT")
 
-    if is_port_in_use(target_port):
-        print(f"[GrammaCheck] Port {target_port} is currently in use.")
-        print("[GrammaCheck] Closing previous server process...")
-        kill_process_on_port(target_port)
+    if port_env:
+        # Running on a hosting platform (Render, etc.)
+        target_port = int(port_env)
+        host = "0.0.0.0"
+        print("=" * 60)
+        print(" 🚀 Starting GrammaCheck AI - NLP Grammar & Spell Checker")
+        print(f" Listening on {host}:{target_port}")
+        print("=" * 60)
+        uvicorn.run(app, host=host, port=target_port)
+    else:
+        # Local development — keep existing behavior
+        target_port = 8080
+        host = "127.0.0.1"
 
-    # If port 8080 is still busy, fallback to next available port
-    if is_port_in_use(target_port):
-        target_port = find_available_port(8081)
-        print(f"[GrammaCheck] Switching to port {target_port}!")
+        if is_port_in_use(target_port):
+            print(f"[GrammaCheck] Port {target_port} is currently in use.")
+            print("[GrammaCheck] Closing previous server process...")
+            kill_process_on_port(target_port)
 
-    url = f"http://127.0.0.1:{target_port}"
-    print("=" * 60)
-    print(" 🚀 Starting GrammaCheck AI - NLP Grammar & Spell Checker")
-    print(f" Dashboard URL: {url}")
-    print(f" Open {url} in your browser to view the updated Dashboard")
-    print("=" * 60)
+        if is_port_in_use(target_port):
+            target_port = find_available_port(8081)
+            print(f"[GrammaCheck] Switching to port {target_port}!")
 
-    uvicorn.run(app, host="127.0.0.1", port=target_port)
+        url = f"http://{host}:{target_port}"
+        print("=" * 60)
+        print(" 🚀 Starting GrammaCheck AI - NLP Grammar & Spell Checker")
+        print(f" Dashboard URL: {url}")
+        print(f" Open {url} in your browser to view the updated Dashboard")
+        print("=" * 60)
 
-
+        uvicorn.run(app, host=host, port=target_port)
