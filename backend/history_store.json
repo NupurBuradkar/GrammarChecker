@@ -1,0 +1,41 @@
+[
+  {
+    "id": "chk_1788812883575_ajfbb",
+    "title": "This are a bad sentence. She go to college and the students ...",
+    "original_text": "This are a bad sentence. She go to college and the students is ready. However the results were very bad due to the fact that I went two the market to recieve the package tommorow.",
+    "corrected_text": "This is a bad sentence. She goes to college and the students are ready. However, the results were disappointing because I went to the market to receive the package tomorrow.",
+    "word_count": 35,
+    "char_count": 179,
+    "score": 76,
+    "issues_count": 9,
+    "tone": "Neutral & Clear",
+    "timestamp": "Sep 8 - 01:58 am",
+    "timestamp_epoch": 1788812883.5781486
+  },
+  {
+    "id": "chk_1788812859564_d06mj",
+    "title": "The results were very bad due to the fact that we had no dat...",
+    "original_text": "The results were very bad due to the fact that we had no data.",
+    "corrected_text": "The results were disappointing because we had no data.",
+    "word_count": 14,
+    "char_count": 62,
+    "score": 94,
+    "issues_count": 2,
+    "tone": "Neutral & Clear",
+    "timestamp": "Sep 8 - 01:57 am",
+    "timestamp_epoch": 1788812859.566108
+  },
+  {
+    "id": "chk_1788812294218_vncxn",
+    "title": "She go to college every day and the students is ready for th...",
+    "original_text": "She go to college every day and the students is ready for the exam.",
+    "corrected_text": "She goes to college every day and the students are ready for the exam.\n",
+    "word_count": 14,
+    "char_count": 67,
+    "score": 83,
+    "issues_count": 2,
+    "tone": "Neutral & Clear",
+    "timestamp": "Sep 8 - 01:48 am",
+    "timestamp_epoch": 1788812294.240604
+  }
+]

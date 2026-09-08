@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GrammaCheck AI — NLP Grammar, Spell & Style Checker with Dashboard</title>
+    <meta name="description" content="AI-powered grammar, spell, punctuation, subject-verb agreement, document upload, performance reporting, and check history.">
+    <link rel="stylesheet" href="css/style.css?v=2.2">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Header Navigation Bar -->
+    <header class="app-header">
+        <div class="brand-section">
+            <div class="brand-logo">G</div>
+            <div class="brand-info">
+                <h1>GrammaCheck</h1>
+                <p>Natural Language Grammar, Spell & Tone Analysis</p>
+            </div>
+        </div>
+
+        <!-- Center Dashboard Navigation Tabs -->
+        <nav class="nav-tabs" id="nav-tabs" aria-label="Main Navigation">
+            <button class="nav-tab active" data-tab="workspace" id="tab-workspace">
+                <span class="nav-tab-icon">📝</span>
+                <span class="nav-tab-label">Writing Editor</span>
+            </button>
+            <button class="nav-tab" data-tab="upload" id="tab-upload">
+                <span class="nav-tab-icon">📁</span>
+                <span class="nav-tab-label">Document Upload</span>
+                <span class="nav-tab-badge">New</span>
+            </button>
+            <button class="nav-tab" data-tab="performance" id="tab-performance">
+                <span class="nav-tab-icon">📊</span>
+                <span class="nav-tab-label">Performance Report</span>
+            </button>
+            <button class="nav-tab" data-tab="history" id="tab-history">
+                <span class="nav-tab-icon">📜</span>
+                <span class="nav-tab-label">History Log</span>
+                <span class="history-count-badge" id="nav-history-count">0</span>
+            </button>
+        </nav>
+
+        <!-- Header Controls & Auth Section -->
+        <div class="header-controls">
+            <!-- Theme Toggle -->
+            <button class="btn-icon-toggle" id="btn-theme-toggle" title="Toggle Light / Dark Mode" aria-label="Toggle Theme">
+                🌙
+            </button>
+
+            <!-- User Auth Container -->
+            <div class="auth-header-section" id="auth-header-section">
+                <!-- Logged Out State -->
+                <div class="auth-guest-controls" id="auth-guest-controls">
+                    <button class="btn-auth-signin" id="btn-open-login">Log In</button>
+                    <button class="btn-auth-signup" id="btn-open-signup">Sign Up</button>
+                </div>
+
+                <!-- Logged In State (Hidden by default) -->
+                <div class="auth-user-profile" id="auth-user-profile" style="display:none;">
+                    <div class="user-avatar" id="header-user-avatar">AM</div>
+                    <div class="user-info-text">
+                        <span class="user-name" id="header-user-name">Alex Morgan</span>
+                        <span class="user-plan-badge" id="header-user-plan">Pro Plan</span>
+                    </div>
+                    <button class="btn-logout" id="btn-logout" title="Log out of account">Sign Out</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="app-container">
+
+        <!-- =========================================================
+             VIEW 1: WRITING WORKSPACE (Interactive Editor & Assessment)
+        ========================================================= -->
+        <section class="dashboard-view active" id="view-workspace">
+            
+            <!-- Hero & Sample Selector -->
+            <div class="hero-banner">
+                <div class="hero-text">
+                    <h2>Write with Confidence & Clarity</h2>
+                    <p>Real-time grammar, spelling, punctuation, vocabulary, and contextual corrections powered by NLP.</p>
+                </div>
+
+                <div class="sample-selector">
+                    <label for="sample-select" style="font-size:12px;font-weight:600;color:var(--text-secondary);">Test with sample:</label>
+                    <select id="sample-select" class="sample-select">
+                        <option value="">-- Choose an example test case --</option>
+                        <option value="this_are">"This are a bad sentence." (Demonstrative SVA)</option>
+                        <option value="spelling">"recieve the package tommorow" (Spelling)</option>
+                        <option value="grammar_sva">"She go to college..." (Verb form & SVA)</option>
+                        <option value="punctuation">"However the result was good" (Punctuation)</option>
+                        <option value="context_homophones">"went two the market" (Homophones)</option>
+                        <option value="vocabulary_style">"results were very bad due to the fact that..." (Style & Vocab)</option>
+                        <option value="tone_colloquial">"Hey, what's up with the report?" (Tone & Rewrite)</option>
+                        <option value="fragment">"Because he was tired." (Sentence Fragment)</option>
+                        <option value="full_paragraph">Comprehensive Multi-Error Paragraph</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Two-Column Workspace Grid -->
+            <div class="grid-workspace">
+                
+                <!-- Left Column: Interactive Editor -->
+                <div class="left-workspace">
+                    
+                    <div class="card editor-card">
+                        <div class="card-header">
+                            <h3><span>📝</span> Interactive Writing Editor</h3>
+                            <div class="card-actions">
+                                <button class="btn-secondary" id="btn-copy-orig" title="Copy original text">
+                                    📋 Copy Text
+                                </button>
+                                <button class="btn-secondary" id="btn-clear" title="Clear editor content">
+                                    🧹 Clear
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="editor-wrapper">
+                            <textarea 
+                                id="editor-input" 
+                                class="text-editor-input" 
+                                placeholder="Type or paste your text here to check spelling, grammar, punctuation, and style...&#10;&#10;Try: This are a bad sentence. She go to college and I went two the market to recieve the package tommorow."
+                                spellcheck="false"
+                            ></textarea>
+
+                            <div class="editor-footer">
+                                <div class="metrics-live">
+                                    <span>Words: <b id="live-words">0</b></span>
+                                    <span>Characters: <b id="live-chars">0</b></span>
+                                    <span style="font-size:11px;color:var(--text-muted);">Shortcut: Ctrl + Enter to check</span>
+                                </div>
+
+                                <div style="display:flex;gap:10px;">
+                                    <button class="btn-secondary" id="btn-save-to-history" title="Save current text to history">
+                                        💾 Save to Log
+                                    </button>
+                                    <button class="btn-primary" id="btn-check">
+                                        <span>✓</span> Check Writing
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Corrected Text Preview Card -->
+                    <div class="card preview-card">
+                        <div class="card-header">
+                            <h3><span>✨</span> Full Corrected Version</h3>
+                            <button class="btn-secondary" id="btn-copy-corrected">
+                                📋 Copy Corrected Text
+                            </button>
+                        </div>
+                        <div class="preview-content" id="preview-content">
+                            Your corrected text will appear here after checking.
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Column: Scores & Issue Feed (Feature #7: Assessment) -->
+                <div class="right-workspace">
+                    
+                    <!-- Accuracy Score Card -->
+                    <div class="card score-card">
+                        <div class="score-gauge">
+                            <svg viewBox="0 0 100 100">
+                                <circle class="bg" cx="50" cy="50" r="40"></circle>
+                                <circle class="progress" id="score-circle-progress" cx="50" cy="50" r="40"></circle>
+                            </svg>
+                            <div class="score-gauge-number">
+                                <span id="score-num">100</span><small>%</small>
+                            </div>
+                        </div>
+
+                        <div class="score-details">
+                            <div class="score-title-row">
+                                <h4 id="score-title">Writing Accuracy</h4>
+                                <span class="score-badge excellent" id="score-badge">Ready</span>
+                            </div>
+                            <p class="score-description" id="score-desc">
+                                Enter text and click Check Writing to evaluate accuracy.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Issues Feed Card (Assessment) -->
+                    <div class="card issues-card" style="margin-top: 20px;">
+                        <div class="card-header">
+                            <h3><span>🔍</span> Writing Issues & Suggestions (Assessment)</h3>
+                        </div>
+
+                        <!-- Category Filter Tabs -->
+                        <div class="filter-tabs" id="filter-tabs">
+                            <button class="filter-tab active" data-filter="all">All Issues <span class="count">0</span></button>
+                        </div>
+
+                        <!-- Issue Cards Container -->
+                        <div class="issues-feed" id="issues-feed">
+                            <div class="empty-state">
+                                <div class="icon">✍️</div>
+                                <h4>Your writing suggestions will appear here</h4>
+                                <p>Start typing or select an example test case to run instant NLP analysis.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Quick Metrics Footer Bar -->
+            <div class="analytics-grid" style="margin-top: 28px;">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span>Total Words</span>
+                        <span>📊</span>
+                    </div>
+                    <div class="metric-value" id="stat-words">0</div>
+                    <div class="metric-subtitle">Total analyzed words</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span>Sentences</span>
+                        <span>📄</span>
+                    </div>
+                    <div class="metric-value" id="stat-sentences">0</div>
+                    <div class="metric-subtitle">Sentence count</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span>Reading Time</span>
+                        <span>⏱️</span>
+                    </div>
+                    <div class="metric-value" id="stat-reading-time">0 min</div>
+                    <div class="metric-subtitle">Average reading speed</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span>Readability</span>
+                        <span>🎯</span>
+                    </div>
+                    <div class="metric-value" id="stat-readability">100/100</div>
+                    <div class="metric-subtitle" id="stat-readability-grade">Very Easy</div>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- =========================================================
+             VIEW 2: DOCUMENT UPLOAD (Feature #6)
+        ========================================================= -->
+        <section class="dashboard-view" id="view-upload">
+            <div class="view-header">
+                <div>
+                    <h2>📁 Upload Document Successfully</h2>
+                    <p>Upload your document to extract text, run comprehensive NLP grammar checking, and generate performance reports.</p>
+                </div>
+            </div>
+
+            <div class="upload-container">
+                <!-- Dropzone Area -->
+                <div class="upload-dropzone" id="upload-dropzone">
+                    <input type="file" id="file-upload-input" accept=".txt,.docx,.pdf,.md,.rtf,.doc" style="display:none;">
+                    <div class="dropzone-icon">📤</div>
+                    <h3>Drag & drop your document file here</h3>
+                    <p>or browse from your computer to upload</p>
+                    
+                    <button class="btn-primary" id="btn-browse-file" style="margin-top:16px;">
+                        <span>📂</span> Choose Document File
+                    </button>
+
+                    <div class="supported-formats-list">
+                        <span class="fmt-badge">.TXT</span>
+                        <span class="fmt-badge">.DOCX</span>
+                        <span class="fmt-badge">.PDF</span>
+                        <span class="fmt-badge">.MD</span>
+                        <span class="fmt-badge">.RTF</span>
+                        <span style="font-size:11px;color:var(--text-muted);margin-left:8px;">Max file size: 10 MB</span>
+                    </div>
+                </div>
+
+                <!-- Upload Success State Card (Feature #6 Success State) -->
+                <div class="upload-success-card" id="upload-success-card" style="display:none;">
+                    <div class="success-banner-row">
+                        <div class="success-icon-badge">✓</div>
+                        <div class="success-message-text">
+                            <h3>Document Uploaded Successfully!</h3>
+                            <p id="upload-success-subtitle">File processed and ready for NLP grammar & style analysis.</p>
+                        </div>
+                        <span class="file-format-tag" id="upload-file-type">TXT</span>
+                    </div>
+
+                    <!-- File Metadata Grid -->
+                    <div class="file-metadata-grid">
+                        <div class="meta-item">
+                            <span class="meta-label">File Name</span>
+                            <span class="meta-value" id="upload-filename">document.txt</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">File Size</span>
+                            <span class="meta-value" id="upload-filesize">0 KB</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Word Count</span>
+                            <span class="meta-value" id="upload-wordcount">0 words</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Character Count</span>
+                            <span class="meta-value" id="upload-charcount">0 chars</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Uploaded At</span>
+                            <span class="meta-value" id="upload-timestamp">Just now</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Engine Status</span>
+                            <span class="meta-value" style="color:var(--brand-primary);font-weight:600;">Ready to Scan</span>
+                        </div>
+                    </div>
+
+                    <!-- Extracted Text Preview -->
+                    <div class="extracted-preview-box">
+                        <div class="extracted-preview-header">
+                            <span>Extracted Document Text Preview</span>
+                            <button class="btn-secondary small" id="btn-copy-extracted">📋 Copy Text</button>
+                        </div>
+                        <textarea class="extracted-textarea" id="extracted-text-preview" readonly></textarea>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="upload-actions-row">
+                        <button class="btn-primary" id="btn-scan-uploaded">
+                            <span>🚀</span> Analyze Document Now
+                        </button>
+                        <button class="btn-secondary" id="btn-upload-another">
+                            <span>🔄</span> Upload Another File
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- =========================================================
+             VIEW 3: GRAPHICAL PERFORMANCE REPORT (Feature #8)
+        ========================================================= -->
+        <section class="dashboard-view" id="view-performance">
+            <div class="view-header">
+                <div>
+                    <h2>📊 Graphical Performance Report</h2>
+                    <p>In-depth analytical breakdown of accuracy scores, readability indexes, error categories, and tone impression.</p>
+                </div>
+                <button class="btn-secondary" id="btn-refresh-report">
+                    <span>🔄</span> Refresh Report
+                </button>
+            </div>
+
+            <!-- Performance Grid Layout -->
+            <div class="perf-grid">
+                
+                <!-- Card 1: Accuracy & Writing Quality Gauge -->
+                <div class="card perf-card">
+                    <div class="card-header">
+                        <h3><span>🎯</span> Accuracy Score & Health Grade</h3>
+                        <span class="score-badge excellent" id="perf-score-badge">Ready</span>
+                    </div>
+                    <div class="perf-card-body" style="text-align:center;">
+                        <div class="perf-gauge-large">
+                            <svg viewBox="0 0 120 120" style="width:130px;height:130px;transform:rotate(-90deg);">
+                                <circle cx="60" cy="60" r="50" class="bg" style="fill:none;stroke:var(--border-color);stroke-width:9;"></circle>
+                                <circle cx="60" cy="60" r="50" id="perf-circle-progress" style="fill:none;stroke:var(--brand-primary);stroke-width:9;stroke-linecap:round;stroke-dasharray:314.15;stroke-dashoffset:0;transition:stroke-dashoffset 0.8s ease;"></circle>
+                            </svg>
+                            <div class="perf-gauge-val">
+                                <span id="perf-score-num">100</span><small>%</small>
+                            </div>
+                        </div>
+                        <h4 id="perf-quality-title" style="font-size:18px;margin-top:10px;">Excellent Writing Quality</h4>
+                        <p id="perf-quality-desc" style="font-size:12px;color:var(--text-secondary);max-width:280px;margin:6px auto 0;">
+                            No major grammatical or stylistic issues detected in the text.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Card 2: Readability Breakdown -->
+                <div class="card perf-card">
+                    <div class="card-header">
+                        <h3><span>📖</span> Readability & Comprehension</h3>
+                        <span class="tag-reading" id="perf-readability-tag">Standard</span>
+                    </div>
+                    <div class="perf-card-body">
+                        <div class="readability-meter">
+                            <div class="meter-bar-header">
+                                <span style="font-size:12px;font-weight:600;">Flesch Reading Ease</span>
+                                <span style="font-size:15px;font-weight:700;color:var(--brand-primary);" id="perf-flesch-num">100 / 100</span>
+                            </div>
+                            <div class="meter-track">
+                                <div class="meter-fill" id="perf-flesch-fill" style="width: 100%;"></div>
+                            </div>
+                            <div class="meter-scales">
+                                <span>0 (Very Hard)</span>
+                                <span>50 (Standard)</span>
+                                <span>100 (Very Easy)</span>
+                            </div>
+                        </div>
+
+                        <div class="readability-details-grid">
+                            <div class="detail-box">
+                                <span class="label">Audience Level</span>
+                                <span class="val" id="perf-audience-level">General Public</span>
+                            </div>
+                            <div class="detail-box">
+                                <span class="label">Avg Sentence Length</span>
+                                <span class="val" id="perf-avg-sentence">12.0 words</span>
+                            </div>
+                            <div class="detail-box">
+                                <span class="label">Avg Syllables/Word</span>
+                                <span class="val" id="perf-avg-syllable">1.4</span>
+                            </div>
+                            <div class="detail-box">
+                                <span class="label">Estimated Reading Time</span>
+                                <span class="val" id="perf-est-reading">1 min</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Issue Category Distribution Chart -->
+                <div class="card perf-card">
+                    <div class="card-header">
+                        <h3><span>📊</span> Issue Category Distribution</h3>
+                        <span style="font-size:12px;color:var(--text-muted);"><b id="perf-total-issues">0</b> total issues</span>
+                    </div>
+                    <div class="perf-card-body">
+                        <div class="cat-dist-list" id="perf-category-distribution">
+                            <!-- Populated dynamically via JS -->
+                            <div class="cat-bar-item">
+                                <div class="cat-bar-label"><span>Spelling</span> <span id="dist-spell-val">0</span></div>
+                                <div class="cat-bar-track"><div class="cat-bar-fill spelling" id="dist-spell-bar" style="width:0%;"></div></div>
+                            </div>
+                            <div class="cat-bar-item">
+                                <div class="cat-bar-label"><span>Grammar</span> <span id="dist-gram-val">0</span></div>
+                                <div class="cat-bar-track"><div class="cat-bar-fill grammar" id="dist-gram-bar" style="width:0%;"></div></div>
+                            </div>
+                            <div class="cat-bar-item">
+                                <div class="cat-bar-label"><span>Punctuation</span> <span id="dist-punc-val">0</span></div>
+                                <div class="cat-bar-track"><div class="cat-bar-fill punctuation" id="dist-punc-bar" style="width:0%;"></div></div>
+                            </div>
+                            <div class="cat-bar-item">
+                                <div class="cat-bar-label"><span>Context / Homophones</span> <span id="dist-ctx-val">0</span></div>
+                                <div class="cat-bar-track"><div class="cat-bar-fill context" id="dist-ctx-bar" style="width:0%;"></div></div>
+                            </div>
+                            <div class="cat-bar-item">
+                                <div class="cat-bar-label"><span>Style & Vocabulary</span> <span id="dist-style-val">0</span></div>
+                                <div class="cat-bar-track"><div class="cat-bar-fill style" id="dist-style-bar" style="width:0%;"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4: Tone & Impression Breakdown -->
+                <div class="card perf-card">
+                    <div class="card-header">
+                        <h3><span>🎭</span> Tone Breakdown & Style Register</h3>
+                        <span class="tone-badge-pill" id="perf-tone-badge">Neutral</span>
+                    </div>
+                    <div class="perf-card-body">
+                        <p style="font-size:12px;color:var(--text-secondary);margin-bottom:14px;" id="perf-tone-summary">
+                            Your writing strikes a balanced and neutral tone.
+                        </p>
+                        <div class="tone-bars" style="grid-template-columns:1fr 1fr;gap:12px;">
+                            <div class="tone-bar-item">
+                                <div class="label"><span>Formal</span><span id="perf-val-formal">50%</span></div>
+                                <div class="tone-bar-track"><div class="tone-bar-fill formal" id="perf-bar-formal" style="width:50%;"></div></div>
+                            </div>
+                            <div class="tone-bar-item">
+                                <div class="label"><span>Casual</span><span id="perf-val-casual">50%</span></div>
+                                <div class="tone-bar-track"><div class="tone-bar-fill casual" id="perf-bar-casual" style="width:50%;"></div></div>
+                            </div>
+                            <div class="tone-bar-item">
+                                <div class="label"><span>Professional</span><span id="perf-val-prof">50%</span></div>
+                                <div class="tone-bar-track"><div class="tone-bar-fill professional" id="perf-bar-prof" style="width:50%;"></div></div>
+                            </div>
+                            <div class="tone-bar-item">
+                                <div class="label"><span>Academic</span><span id="perf-val-acad">50%</span></div>
+                                <div class="tone-bar-track"><div class="tone-bar-fill academic" id="perf-bar-acad" style="width:50%;"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- =========================================================
+             VIEW 4: HISTORY (PAST CHECKS LOG) (Feature #9)
+        ========================================================= -->
+        <section class="dashboard-view" id="view-history">
+            <div class="view-header">
+                <div>
+                    <h2>📜 Document Check History & Past Logs</h2>
+                    <p>Review previous text scans, re-load saved documents into the editor, or export detailed diagnostic reports.</p>
+                </div>
+                <div style="display:flex;gap:10px;">
+                    <button class="btn-secondary" id="btn-clear-history">
+                        <span>🗑️</span> Clear History
+                    </button>
+                </div>
+            </div>
+
+            <!-- History Search & Filter Bar -->
+            <div class="history-controls-bar">
+                <div class="search-input-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="history-search-input" placeholder="Search past checks by keyword, title, or date...">
+                </div>
+
+                <div class="history-filters">
+                    <label style="font-size:12px;color:var(--text-secondary);font-weight:600;">Filter:</label>
+                    <select id="history-filter-select" class="sample-select">
+                        <option value="all">All Past Checks</option>
+                        <option value="high">High Accuracy (≥ 85%)</option>
+                        <option value="medium">Average (70% - 84%)</option>
+                        <option value="low">Needs Work (&lt; 70%)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- History Log Cards List -->
+            <div class="history-list-container" id="history-list-container">
+                <!-- Dynamically rendered by JavaScript -->
+                <div class="empty-state">
+                    <div class="icon">📜</div>
+                    <h4>No check history found</h4>
+                    <p>Checks you perform in the editor or uploaded documents will automatically be recorded here.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+
+    <!-- =========================================================
+         LOGIN & SIGN-UP MODAL
+    ========================================================= -->
+    <div class="modal-overlay" id="auth-modal" style="display:none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title-wrap">
+                    <div class="brand-logo" style="width:34px;height:34px;font-size:18px;">G</div>
+                    <h3>Account Access</h3>
+                </div>
+                <button class="btn-modal-close" id="btn-close-modal" aria-label="Close Modal">✕</button>
+            </div>
+
+            <!-- Modal Tab Switcher -->
+            <div class="modal-tabs">
+                <button class="modal-tab active" id="tab-modal-login">Sign In</button>
+                <button class="modal-tab" id="tab-modal-signup">Create Account</button>
+            </div>
+
+            <!-- Quick Demo Login Button -->
+            <div class="demo-login-box">
+                <p>Want a quick test drive? Click to auto-fill with the demo account:</p>
+                <button class="btn-demo-quick" id="btn-quick-demo">
+                    <span>⚡</span> 1-Click Demo Login (Alex Morgan - Pro)
+                </button>
+            </div>
+
+            <!-- Sign In Form -->
+            <form id="form-login" class="auth-form active">
+                <div class="form-group">
+                    <label for="login-email">Email Address</label>
+                    <input type="email" id="login-email" placeholder="name@example.com" required value="demo@grammacheck.ai">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="••••••••" required value="password123">
+                </div>
+                <div class="form-error" id="login-error" style="display:none;"></div>
+                <button type="submit" class="btn-primary" style="width:100%;justify-content:center;margin-top:10px;">
+                    Sign In to GrammaCheck
+                </button>
+            </form>
+
+            <!-- Sign Up Form -->
+            <form id="form-signup" class="auth-form" style="display:none;">
+                <div class="form-group">
+                    <label for="signup-name">Full Name</label>
+                    <input type="text" id="signup-name" placeholder="e.g. Sarah Jenkins" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-email">Email Address</label>
+                    <input type="email" id="signup-email" placeholder="sarah@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" placeholder="Create a strong password" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-plan">Account Plan</label>
+                    <select id="signup-plan" class="sample-select" style="width:100%;">
+                        <option value="Pro">Pro Plan (Full History & Upload Access)</option>
+                        <option value="Free">Free Plan (Standard Assessment)</option>
+                    </select>
+                </div>
+                <div class="form-error" id="signup-error" style="display:none;"></div>
+                <button type="submit" class="btn-primary" style="width:100%;justify-content:center;margin-top:10px;">
+                    Create Free Account
+                </button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Toast Notification Banner -->
+    <div id="toast-notification"></div>
+
+    <script src="js/app.js?v=2.2"></script>
+</body>
+</html>
